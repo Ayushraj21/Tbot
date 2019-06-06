@@ -76,7 +76,6 @@ async def evaluate(query):
             )
 
 
-
 @register(outgoing=True, pattern=r"^.exec(?: |$)([\s\S]*)")
 async def run(run_q):
     """ For .exec command, which executes the dynamically created program """
@@ -193,7 +192,6 @@ async def terminal_runner(term):
             )
             remove("output.txt")
             return
-
 
         if uid is 0:
             await term.edit(

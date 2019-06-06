@@ -12,7 +12,7 @@ from shutil import which
 
 from telethon import version
 
-from userbot import CMD_HELP
+from userbot import CMD_HELP, MONGO, REDIS, is_mongo_alive, is_redis_alive
 from userbot.events import register
 
 
@@ -77,7 +77,7 @@ async def bot_ver(event):
             )
         else:
             await event.edit(
-                "Shame that you don't have git, You're running r2.2a anyway"
+                "Shame that you don't have git, You're running r3.0-alpha anyway"
             )
 
 
@@ -111,15 +111,19 @@ async def pipcheck(pip):
 
 
 @register(outgoing=True, pattern="^.alive$")
-async def amireallyalive(alive):
-    """ For .alive command, check if the bot is running.  """
-    if not alive.text[0].isalpha() and alive.text[0] not in ("/", "#", "@", "!"):
-        await alive.edit(
+async def amireallyalive(e):
+    if not e.text[0].isalpha() and e.text[0] not in ("/", "#", "@", "!"):
+        if not is_mongo_alive() or not is_redis_alive():
+            db = "Either Mongo or Redis Database seems to be failing!"
+        else:
+            db = "Databases functioning normally!"
+        await e.edit(
             "`"
-            " BOT RUNNING... \n\n"
+            "...BOT RUNNING \n\n"
             f"Telethon version: {version.__version__} \n"
             f"Python:           {python_version()} \n"
-            f"User:             {DEFAULTUSER}"
+            f"User:             {DEFAULTUSER} \n"
+            f"Database Status:  {db}"
             "`"
             )
 

@@ -20,16 +20,18 @@ from telethon.tl.types import (ChannelParticipantsAdmins, ChatAdminRights,
                                ChatBannedRights, MessageEntityMentionName,
                                MessageMediaPhoto)
 
+from telethon.tl.functions.messages import UpdatePinnedMessageRequest
 
-from userbot import BOTLOG, BOTLOG_CHATID, BRAIN_CHECKER, CMD_HELP, bot
+from userbot import BRAIN_CHECKER, CMD_HELP, BOTLOG, BOTLOG_CHATID, bot, MONGO, REDIS, is_mongo_alive, is_redis_alive
 from userbot.events import register
+import pymongo
 
 # =================== CONSTANT ===================
 PP_TOO_SMOL = "`The image is too small`"
 PP_ERROR = "`Failure while processing image`"
 NO_ADMIN = "`You aren't an admin!`"
 NO_PERM = "`You don't have sufficient permissions!`"
-NO_SQL = "`Running on Non-SQL mode!`"
+NO_SQL = "`Database connections failing!`"
 
 CHAT_PP_CHANGED = "`Chat Picture Changed`"
 CHAT_PP_ERROR = "`Some issue with updating the pic,`" \
@@ -336,12 +338,9 @@ async def spider(spdr):
     """
     if not spdr.text[0].isalpha() and spdr.text[0] not in ("/", "#", "@", "!"):
         # Check if the function running under SQL mode
-        try:
-            from userbot.modules.sql_helper.spam_mute_sql import mute
-        except AttributeError:
+        if not is_mongo_alive() or not is_redis_alive():
             await spdr.edit(NO_SQL)
             return
-
         # Admin or creator check
         chat = await spdr.get_chat()
         admin = chat.admin_rights
@@ -367,7 +366,10 @@ async def spider(spdr):
 
         # If everything goes well, do announcing and mute
         await spdr.edit("`Gets a tape!`")
-        mute(spdr.chat_id, user.id)
+        MONGO.bot.filters.insert_one({
+            'chat_id': new_handler.chat_id,
+            'user_id': user.id
+        })
 
         # Announce that the function is done
         await spdr.edit("`Safely taped!`")
@@ -399,12 +401,9 @@ async def unmoot(unmot):
             return
 
         # Check if the function running under SQL mode
-        try:
-            from userbot.modules.sql_helper.spam_mute_sql import unmute
-        except AttributeError:
+        if not is_mongo_alive() or not is_redis_alive():
             await unmot.edit(NO_SQL)
             return
-
         # If admin or creator, inform the user and start unmuting
         await unmot.edit('```Unmuting...```')
         user = await get_user_from_event(unmot)
@@ -413,7 +412,11 @@ async def unmoot(unmot):
         else:
             return
 
-        unmute(unmot.chat_id, user.id)
+        old = MONGO.filters.find_one({
+            'chat_id': unmot.chat_id,
+            'user_id': user_id})
+        if old:
+            MONGO.bot.mute.delete_one({'_id': old['_id']})
 
         try:
             await unmot.client(
@@ -440,11 +443,6 @@ async def unmoot(unmot):
 @register(incoming=True)
 async def muter(moot):
     """ Used for deleting the messages of muted people """
-    try:
-        from userbot.modules.sql_helper.spam_mute_sql import is_muted
-        from userbot.modules.sql_helper.gmute_sql import is_gmuted
-    except AttributeError:
-        return
     muted = is_muted(moot.chat_id)
     gmuted = is_gmuted(moot.sender_id)
     rights = ChatBannedRights(
@@ -487,10 +485,9 @@ async def ungmoot(un_gmute):
             return
 
         # Check if the function running under SQL mode
-        try:
-            from userbot.modules.sql_helper.gmute_sql import ungmute
-        except AttributeError:
+        if not is_mongo_alive() or not is_redis_alive():
             await un_gmute.edit(NO_SQL)
+            return
 
         user = await get_user_from_event(un_gmute)
         if user:
@@ -530,12 +527,9 @@ async def gspider(gspdr):
             return
 
         # Check if the function running under SQL mode
-        try:
-            from userbot.modules.sql_helper.gmute_sql import gmute
-        except AttributeError:
+        if not is_mongo_alive() or not is_redis_alive():
             await gspdr.edit(NO_SQL)
             return
-
         user = await get_user_from_event(gspdr)
         if user:
             pass

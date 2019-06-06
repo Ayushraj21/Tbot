@@ -12,7 +12,7 @@ from telethon.tl.functions.users import GetFullUserRequest
 from sqlalchemy.exc import IntegrityError
 
 from userbot import (COUNT_PM, CMD_HELP, BOTLOG, BOTLOG_CHATID,
-                     PM_AUTO_BAN, BRAIN_CHECKER, LASTMSG, LOGS)
+                     PM_AUTO_BAN, BRAIN_CHECKER, LASTMSG, LOGS, is_mongo_alive, is_redis_alive)
 from userbot.events import register
 
 # ========================= CONSTANTS ============================
@@ -31,13 +31,15 @@ async def permitpm(event):
         if event.sender_id in BRAIN_CHECKER:
             return
         if event.is_private and not (await event.get_sender()).bot:
-            try:
-                from userbot.modules.sql_helper.pm_permit_sql import is_approved
-                from userbot.modules.sql_helper.globals import gvarstatus
-            except AttributeError:
+            if not is_mongo_alive() or not is_redis_alive():
                 return
-            apprv = is_approved(event.chat_id)
-            notifsoff = gvarstatus("NOTIF_OFF")
+            apprv = MONGO.bot.pmpermit.find_one(
+                {"user_id": event.chat_id}
+                )
+            
+            NOTIF_OFF = MONGO.bot.notifoff.find_one(
+                {"status": "True"}
+                )
 
             # This part basically is a sanity check
             # If the message that sent before is Unapproved Message
@@ -72,10 +74,10 @@ async def permitpm(event):
                         del LASTMSG[event.chat_id]
                     except KeyError:
                         if BOTLOG:
-                            await event.client.send_message(
-                                BOTLOG_CHATID,
-                                "Count PM is seemingly going retard, plis restart bot!",
-                            )
+                             await event.client.send_message(
+                              BOTLOG_CHATID,
+                              "Count PM is seemingly going retard, plis restart bot!",
+                              )
                         LOGS.info("CountPM wen't rarted boi")
                         return
 
@@ -124,10 +126,8 @@ async def notifon(non_event):
 async def approvepm(apprvpm):
     """ For .approve command, give someone the permissions to PM you. """
     if not apprvpm.text[0].isalpha() and apprvpm.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.pm_permit_sql import approve
-        except AttributeError:
-            await apprvpm.edit("`Running on Non-SQL mode!`")
+        if not is_mongo_alive() or not is_redis_alive():
+            await apprvpm.edit("`Database connections failing!`")
             return
 
         if apprvpm.reply_to_msg_id:
@@ -142,12 +142,15 @@ async def approvepm(apprvpm):
             name0 = str(aname.first_name)
             uid = apprvpm.chat_id
 
-        try:
-            approve(uid)
-        except IntegrityError:
-            await apprvpm.edit("`User may already be approved.`")
+        old = MONGO.bot.pmpermit.find_one(
+            {"user_id": apprvpm.chat_id}
+            )
+        if old:
+            await apprvpm.edit("`User was already approved!`")
             return
-
+        MONGO.bot.pmpermit.insert_one(
+            {"user_id": apprvpm.chat_id }
+            )
         await apprvpm.edit(
             f"[{name0}](tg://user?id={uid}) `approved to PM!`"
         )
@@ -180,12 +183,15 @@ async def blockpm(block):
             name0 = str(aname.first_name)
             uid = block.chat_id
 
-        try:
-            from userbot.modules.sql_helper.pm_permit_sql import dissprove
-            dissprove(uid)
-        except AttributeError:  # Non-SQL mode.
-            pass
-
+        if not is_mongo_alive() or not is_redis_alive():
+            await block.edit("`Database connections failing!`")
+            return
+        old = MONGO.bot.pmpermit.find_one({"user_id": block.chat_id })
+        if old:
+            MONGO.bot.pmpermit.delete_one({'_id': old['_id']})
+            await block.edit("`Blocc'ed`")
+        else:
+            await block.edit("`First approve, before blocc'ing`")
         if BOTLOG:
             await block.client.send_message(
                 BOTLOG_CHATID,

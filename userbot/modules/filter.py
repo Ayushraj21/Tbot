@@ -7,8 +7,8 @@
 
 from asyncio import sleep
 from re import fullmatch, IGNORECASE
-
-from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP
+import pymongo
+from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, MONGO, REDIS, is_mongo_alive, is_redis_alive
 from userbot.events import register
 
 
@@ -17,18 +17,18 @@ async def filter_incoming_handler(handler):
     """ Checks if the incoming message contains handler of a filter """
     try:
         if not (await handler.get_sender()).bot:
-            try:
-                from userbot.modules.sql_helper.filter_sql import get_filters
-            except AttributeError:
-                await handler.edit("`Running on Non-SQL mode!`")
+            if not is_mongo_alive() or not is_redis_alive():
+                await handler.edit("`Database connections failing!`")
                 return
             listes = handler.text.split(" ")
-            filters = get_filters(handler.chat_id)
-            for trigger in filters:
+            filters = MONGO.bot.filters.find_one({'chat_id': handler.chat_id})
+            if not filters:
+                return
+            for trigger in filters['keyword']:
                 for item in listes:
-                    pro = fullmatch(trigger.keyword, item, flags=IGNORECASE)
+                    pro = re.fullmatch(trigger['keyword'], item, flags=re.IGNORECASE)
                     if pro:
-                        await handler.reply(trigger.reply)
+                        await handler.reply(trigger['msg'])
                         return
     except AttributeError:
         pass
@@ -38,17 +38,24 @@ async def filter_incoming_handler(handler):
 async def add_new_filter(new_handler):
     """ For .filter command, allows adding new filters in a chat """
     if not new_handler.text[0].isalpha() and new_handler.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.filter_sql import add_filter
-        except AttributeError:
-            await new_handler.edit("`Running on Non-SQL mode!`")
+        if not is_mongo_alive() or not is_redis_alive():
+            await new_handler.edit("`Database connections failing!`")
             return
         message = new_handler.text
-        kek = message.split()
+        keyword = message.split()
         string = ""
-        for i in range(2, len(kek)):
-            string = string + " " + str(kek[i])
-        add_filter(str(new_handler.chat_id), kek[1], string)
+        for i in range(2, len(keyword)):
+            string = string + " " + str(keyword[i])
+        old = MONGO.bot.filters.find_one({
+            'chat_id': new_handler.chat_id,
+            'keyword': keyword[1]})
+        if old:
+            MONGO.bot.filters.delete_one({'_id': old['_id']})
+        MONGO.bot.filters.insert_one({
+            'chat_id': new_handler.chat_id,
+            'keyword': keyword[1],
+            'msg': string
+        })
         await new_handler.edit("```Filter added successfully```")
 
 
@@ -56,35 +63,45 @@ async def add_new_filter(new_handler):
 async def remove_a_filter(r_handler):
     """ For .stop command, allows you to remove a filter from a chat. """
     if not r_handler.text[0].isalpha() and r_handler.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.filter_sql import remove_filter
-        except AttributeError:
-            await r_handler.edit("`Running on Non-SQL mode!`")
+        if not is_mongo_alive() or not is_redis_alive():
+            await r_handler.edit("`Database connections failing!`")
             return
         message = r_handler.text
         kek = message.split(" ")
-        remove_filter(r_handler.chat_id, kek[1])
+        old = MONGO.bot.filters.find_one({
+            'chat_id': r_handler.chat_id,
+            'keyword': kek})
+        if old:
+            MONGO.bot.filters.delete_one({'_id': old['_id']})
         await r_handler.edit("```Filter removed successfully```")
 
 
-@register(outgoing=True, pattern="^.rmfilters$")
+@register(outgoing=True, pattern="^.rmfilters (.*)")
 async def kick_marie_filter(kick):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
     if not kick.text[0].isalpha() and kick.text[0] not in ("/", "#", "@", "!"):
-        await kick.edit("```Will be kicking away all Marie filters.```")
+        bot_type=kick.pattern_match.group(1)
+        if bot_type not in ["marie","rose"]:
+            await kick.edit("`That bot is not yet supported!`")
+            return
+        await kick.edit("```Will be kicking away all Filters!```")
         sleep(3)
         resp = await kick.get_reply_message()
         filters = resp.text.split("-")[1:]
         for i in filters:
-            await kick.reply("/stop %s" % (i.strip()))
+            if bot_type == "marie":   
+                await kick.reply("/stop %s" % (i.strip()))
+            if bot_type == "rose":
+                i = i.replace('`', '')     #### Rose filters are wrapped under this, to make it touch to copy
+                await kick.reply("/stop %s" % (i.strip()))
             await sleep(0.3)
         await kick.respond(
-            "```Successfully purged Marie filters yaay!```\n Gimme cookies!"
+            "```Successfully purged bots filters yaay!```\n Gimme cookies!"
         )
         if BOTLOG:
             await kick.client.send_message(
-                BOTLOG_CHATID, "I cleaned all Marie filters at " +
+                BOTLOG_CHATID, "I cleaned all filters at " +
                 str(kick.chat_id)
             )
 
@@ -93,16 +110,14 @@ async def kick_marie_filter(kick):
 async def filters_active(event):
     """ For .filters command, lists all of the active filters in a chat. """
     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.filter_sql import get_filters
-        except AttributeError:
-            await event.edit("`Running on Non-SQL mode!`")
+        if not is_mongo_alive() or not is_redis_alive():
+            await event.edit("`Database connections failing!`")
             return
         transact = "`There are no filters in this chat.`"
-        filters = get_filters(event.chat_id)
+        filters = MONGO.bot.filters.find({'chat_id': event.chat_id})
         for i in filters:
             message = "Active filters in this chat: \n\n"
-            transact = message + "🔹 " + i.keyword + "\n"
+            transact = message + "🔹 " + i['keyword'] + "\n"
         await event.edit(transact)
 
 CMD_HELP.update({

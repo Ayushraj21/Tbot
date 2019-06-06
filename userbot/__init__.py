@@ -15,6 +15,8 @@ from dotenv import load_dotenv
 from requests import get
 from telethon import TelegramClient
 from telethon.sessions import StringSession
+from pymongo import MongoClient
+import redis
 
 load_dotenv("config.env")
 
@@ -66,7 +68,7 @@ CONSOLE_LOGGER_VERBOSE = sb(
     os.environ.get("CONSOLE_LOGGER_VERBOSE", "False")
     )
 
-DB_URI = os.environ.get("DATABASE_URL", None)
+MONGO_DB_URI = os.environ.get("MONGO_DB_URI", None)
 
 SCREENSHOT_LAYER_ACCESS_KEY = os.environ.get(
     "SCREENSHOT_LAYER_ACCESS_KEY", None
@@ -100,8 +102,29 @@ URL = 'https://raw.githubusercontent.com/RaphielGang/databasescape/master/learni
 with open('learning-data-root.check', 'wb') as load:
     load.write(get(URL).content)
 
+# Init Mongo
+MONGO = MongoClient(MONGO_DB_URI, 27017, serverSelectionTimeoutMS=1)
+
+def is_mongo_alive():
+    try:
+        MONGO.server_info()
+    except:
+        return False
+    return True
+# Init Redis
+####### Redis will be hosted inside the docker container that hosts the bot
+####### We need redis for just caching, so we just leave it to non-persistent
+
+REDIS = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+def is_redis_alive():
+    try:
+        REDIS.ping()
+    except:
+        return False
+    return True
+
 # Global Variables
-SNIPE_TEXT = ""
 COUNT_MSG = 0
 BRAIN_CHECKER = []
 USERS = {}
@@ -109,11 +132,7 @@ WIDE_MAP = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))
 WIDE_MAP[0x20] = 0x3000
 COUNT_PM = {}
 LASTMSG = {}
-ISAFK = False
 ENABLE_KILLME = True
-SNIPE_ID = 0
-MUTING_USERS = {}
-MUTED_USERS = {}
 CMD_HELP = {}
 AFKREASON = "no reason"
 DISABLE_RUN = False
