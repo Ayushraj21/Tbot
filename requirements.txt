@@ -40,7 +40,6 @@ telegraph
 telethon-session-sqlalchemy>=0.2.6
 spotify_token
 hachoir
-psycopg2-binary
 pybase64>=0.4.0
 python-dotenv
 pytube
@@ -55,5 +54,6 @@ urbandict>=0.5
 wikipedia>=1.4.0
 zalgo_text>=0.6
 spotify_token
-pymongo
+pymongo[srv]
 redis
+dnspython
