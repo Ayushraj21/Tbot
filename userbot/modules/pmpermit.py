@@ -96,26 +96,6 @@ async def permitpm(event):
                             + " was just another retarded nibba",
                         )
 
-@register(disable_edited=True, outgoing=True)
-async def auto_accept(event):
-    """ Will approve automatically if you texted them first. """
-    if event.is_private and not (await event.get_sender()).bot:
-            if not is_mongo_alive() or not is_redis_alive():
-                return
-        chat = await event.get_chat()
-        if isinstance(chat, User):
-            if is_approved(event.chat_id):
-                return
-            async for message in event.client.iter_messages(chat.id, reverse=True, limit=1):
-                if message.from_id == (await event.client.get_me()).id:
-                    approve(chat.id)
-                if BOTLOG:
-                    await event.client.send_message(
-                        BOTLOG_CHATID,
-                        "#AUTO-APPROVED\n"
-                        + "User: " + f"[{chat.first_name}](tg://user?id={chat.id})",
-                    )
-
 @register(outgoing=True, pattern="^.notifoff$")
 async def notifoff(noff_event):
     """ For .notifoff command, stop getting notifications from unapproved PMs. """
