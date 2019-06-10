@@ -19,7 +19,7 @@
 /**
 ```
 
-A modular telegram Python UserBot running on python3 with an sqlalchemy database.
+A modular telegram Python UserBot running on python3 with a mongoDB coupled with Redis backend.
 
 Started up as a simple bot, which helps with deleting messages and other stuffs when I didn't possess a smartphone(selecting each message indeed difficult) with a ton of meme features kanged from [SkittBot](https://github.com/skittles9823/SkittBot), it has evolved, becoming extremely modular and simple to use.
 
@@ -46,6 +46,7 @@ I would like to thank people who assisted me throughout this project:
 * [@rupansh](https://github.com/rupansh)
 * [@zakaryan2004](https://github.com/zakaryan2004)
 * [@kandnub](https://github.com/kandnub)
+* [@pqhaz](https://github.com/pqhaz)
 
 and many more people who aren't mentioned here.
 
