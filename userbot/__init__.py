@@ -14,6 +14,7 @@ from distutils.util import strtobool as sb
 from dotenv import load_dotenv
 from requests import get
 from telethon import TelegramClient
+from telethon.sessions import StringSession
 from pymongo import MongoClient
 import redis
 
@@ -51,6 +52,9 @@ if CONFIG_CHECK:
     quit(1)
 
 API_KEY = os.environ.get("API_KEY", None)
+
+STRING_SESSION = os.environ.get("STRING_SESSION", None)
+
 
 API_HASH = os.environ.get("API_HASH", None)
 
