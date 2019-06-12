@@ -54,8 +54,6 @@ WORKDIR /home/userbot/userbot
 #Copies session and config(if it exists)
 #
 
-
-
 #
 # Install requirements
 #

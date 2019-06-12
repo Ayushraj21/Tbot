@@ -18,7 +18,6 @@ from telethon.sessions import StringSession
 from pymongo import MongoClient
 import redis
 
-
 load_dotenv("config.env")
 
 # Bot Logs setup:
@@ -54,7 +53,6 @@ if CONFIG_CHECK:
 API_KEY = os.environ.get("API_KEY", None)
 
 STRING_SESSION = os.environ.get("STRING_SESSION", None)
-
 
 API_HASH = os.environ.get("API_HASH", None)
 
@@ -92,7 +90,7 @@ SPOTIFY_BIO_PREFIX = os.environ.get("SPOTIFY_BIO_PREFIX", None)
 DEFAULT_BIO = os.environ.get("DEFAULT_BIO", None)
 
 # pylint: disable=invalid-name
-bot = TelegramClient("userbot", API_KEY, API_HASH)
+bot = TelegramClient(StringSession(STRING_SESSION), API_KEY, API_HASH)
 
 if os.path.exists("learning-data-root.check"):
     os.remove("learning-data-root.check")

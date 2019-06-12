@@ -138,11 +138,11 @@ async def amireallyalive(e):
             db = "Databases functioning normally!"
         await e.edit(
             "`"
-            "Your bot is running \n\n"
+            "...BOT RUNNING \n\n"
             f"Telethon version: {version.__version__} \n"
-            f"Python: {python_version()} \n"
-            f"User: {DEFAULTUSER} \n"
-            f"Database Status: {db}"
+            f"Python:           {python_version()} \n"
+            f"User:             {DEFAULTUSER} \n"
+            f"Database Status:  {db}"
             "`"
             )
 

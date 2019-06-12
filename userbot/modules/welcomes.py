@@ -22,6 +22,7 @@ async def welcome_mute(welcm):
     if not WELCOME_MUTE:
         return
     if welcm.user_joined or welcm.user_added:
+
         if welcm.user_added:
             ignore = False
             adder = welcm.action_message.from_id
@@ -115,6 +116,7 @@ async def welcome_mute(welcm):
                     )
 
                     await sleep(1)
+
                     
                     await welcm.client(
                         EditBannedRequest(
