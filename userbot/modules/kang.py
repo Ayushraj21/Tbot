@@ -20,7 +20,8 @@ from userbot.events import register
 async def kang(args):
     """ For .kang command, kangs stickers or creates new ones. """
     if not args.text[0].isalpha() and args.text[0] not in ("/", "#", "@", "!"):   	
-        user = await bot.get_me()        
+        user = await bot.get_me() 
+        await args.edit("processing kang...")
         if not user.username:
             user.username = user.first_name
         message = await args.get_reply_message()
