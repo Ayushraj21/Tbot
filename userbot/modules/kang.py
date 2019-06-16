@@ -19,8 +19,8 @@ from userbot.events import register
 @register(outgoing=True, pattern="^.kang")
 async def kang(args):
     """ For .kang command, kangs stickers or creates new ones. """
-    if not args.text[0].isalpha() and args.text[0] not in ("/", "#", "@", "!"):
-        user = await bot.get_me()
+    if not args.text[0].isalpha() and args.text[0] not in ("/", "#", "@", "!"):   	
+        user = await bot.get_me()        
         if not user.username:
             user.username = user.first_name
         message = await args.get_reply_message()
@@ -45,11 +45,11 @@ async def kang(args):
             await args.edit("`Reply to photo to kang it bruh`")
             return
 
-        if photo:
+        if photo:        	
             image = await resize_photo(photo)
             splat = args.text.split()
             if not emojibypass:
-                emoji = "🤔"
+                emoji = "👻"
             pack = "1"
             if len(splat) == 3:
                 pack = splat[2]  # User sent both
@@ -62,9 +62,9 @@ async def kang(args):
                     # User sent just custom emote, wants to push to default pack
                     emoji = splat[1]
 
-            packname = f"a{user.id}_by_{user.username}_{pack}"
+            packname = f"mem_pack_{pack}"
             response = urllib.request.urlopen(
-                urllib.request.Request(f'http://t.me/addstickers/{packname}')
+                urllib.request.Request(f'https://t.me/addstickers/mem_pack_{pack}')
             )
             htmlstr = response.read().decode("utf8").split('\n')
             file = io.BytesIO()
@@ -125,7 +125,7 @@ async def kang(args):
                     await bot.send_read_acknowledge(conv.chat_id)
 
             await args.edit(
-                f"Sticker added! Your pack can be found [here](t.me/addstickers/{packname})",
+                f"Sticker added! Your pack can be found [here](https://t.me/addstickers/mem_pack_{pack})",
                 parse_mode='md'
             )
 
