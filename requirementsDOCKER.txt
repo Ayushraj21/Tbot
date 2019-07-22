@@ -63,3 +63,4 @@ spotify_token
 pymongo[srv]
 redis
 dnspython
+pyDownload
