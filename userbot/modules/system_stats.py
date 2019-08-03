@@ -18,6 +18,8 @@ from userbot.events import register
 
 # ================= CONSTANT =================
 DEFAULTUSER = uname().node
+
+
 # ============================================
 
 
@@ -139,7 +141,7 @@ async def amireallyalive(e):
             db = "Databases functioning normally!"
         await e.edit(
             "`"
-            "Your bot is running \n\n"
+            "Ya BOi .. I'm running 😜 \n\n"
             f"Telethon version: {version.__version__} \n"
             f"Python: {python_version()} \n"
             f"User: {DEFAULTUSER} \n"
@@ -183,19 +185,18 @@ async def amireallyalivereset(ureset):
 
 CMD_HELP.update({
     "sysd": ".sysd\
-    \nUsage: Show system information using neofetch."
+    \nUsage: Shows system information using neofetch."
 })
 CMD_HELP.update({
     "botver": ".botver\
-    \nUsage: Show the userbot version."
+    \nUsage: Shows the userbot version."
 })
 CMD_HELP.update({
     "pip": ".pip <module(s)>\
-    \nUsage: Search module(s) in PyPi."
+    \nUsage: Does a search of pip modules(s)."
 })
 CMD_HELP.update({
     "alive": ".alive\
-    \nUsage: Check if your bot is working or not. \
-Use .aliveu <new_user> to change user name, or .resetalive \
-to reset it to default."
+    \nUsage: It's used to check if your bot is working or not. \
+Use .aliveu <new_user> to change user or .resetalive to reset .alive."
 })
