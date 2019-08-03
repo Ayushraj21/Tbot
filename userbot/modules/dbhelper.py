@@ -37,15 +37,15 @@ async def unmute(chatid, userid):
 
 
 async def get_muted(chatid):
-        muted_db = MONGO.mutes.find({
-            'chat_id': int(chatid)
-        })
+    muted_db = MONGO.mutes.find({
+        'chat_id': int(chatid)
+    })
 
-        muted = []
-        for user in muted_db:
-            muted.append(user["user_id"])
+    muted = []
+    for user in muted_db:
+        muted.append(user["user_id"])
 
-        return muted
+    return muted
 
 
 # GMutes
@@ -191,6 +191,82 @@ async def delete_note(chatid, name):
             'name': to_check["name"],
             'text': to_check["text"],
         })
+
+
+# Lists
+async def get_lists(chatid):
+    return MONGO.lists.find({
+        '$or': [
+            {'chat_id': chatid},
+            {'chat_id': 0}
+        ]
+    })
+
+
+async def get_list(chatid, name):
+    return MONGO.lists.find_one({
+        '$or': [
+            {'chat_id': chatid},
+            {'chat_id': 0}
+        ],
+        'name': name
+    })
+
+
+async def add_list(chatid, name, items):
+    to_check = await get_list(chatid, name)
+
+    if not to_check:
+        MONGO.lists.insert_one({
+            'chat_id': chatid,
+            'name': name,
+            'items': items
+        })
+
+        return True
+    else:
+        MONGO.lists.update_one({
+            '_id': to_check["_id"],
+            'chat_id': to_check["chat_id"],
+            'name': to_check["name"],
+        }, {"$set": {
+            'items': items
+        }})
+
+        return False
+
+
+async def delete_list(chatid, name):
+    to_check = await get_list(chatid, name)
+
+    if not to_check:
+        return False
+    else:
+        MONGO.lists.delete_one({
+            '_id': to_check["_id"],
+            'chat_id': to_check["chat_id"],
+            'name': to_check["name"],
+            'items': to_check["items"],
+        })
+
+
+async def set_list(oldchatid, name, newchatid):
+    to_check = await get_list(oldchatid, name)
+
+    if not to_check:
+        return False
+    else:
+        MONGO.lists.update_one({
+            '_id': to_check["_id"],
+            'name': to_check["name"],
+            'items': to_check["items"]
+        }, {"$set": {
+            'chat_id': newchatid
+        }})
+
+        return True
+
+##########
 
 
 async def approval(userid):

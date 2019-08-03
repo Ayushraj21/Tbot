@@ -15,7 +15,8 @@ from userbot.events import register
 @register(outgoing=True, pattern="^.userid$")
 async def useridgetter(target):
     """ For .userid command, returns the ID of the target user. """
-    if not target.text[0].isalpha() and target.text[0] not in ("/", "#", "@", "!"):
+    if not target.text[0].isalpha() and target.text[0] not in (
+            "/", "#", "@", "!"):
         message = await target.get_reply_message()
         if message:
             if not message.forward:
@@ -47,7 +48,8 @@ async def chatidgetter(chat):
 @register(outgoing=True, pattern=r"^.log(?: |$)([\s\S]*)")
 async def log(log_text):
     """ For .log command, forwards a message or the command argument to the bot logs group """
-    if not log_text.text[0].isalpha() and log_text.text[0] not in ("/", "#", "@", "!"):
+    if not log_text.text[0].isalpha(
+    ) and log_text.text[0] not in ("/", "#", "@", "!"):
         if BOTLOG:
             if log_text.reply_to_msg_id:
                 reply_msg = await log_text.get_reply_message()
@@ -69,21 +71,22 @@ async def log(log_text):
 @register(outgoing=True, pattern="^.kickme$")
 async def kickme(leave):
     """ Basically it's .kickme command """
-    if not leave.text[0].isalpha() and leave.text[0] not in ("/", "#", "@", "!"):
+    if not leave.text[0].isalpha() and leave.text[0] not in (
+            "/", "#", "@", "!"):
         await leave.edit("`Nope, no, no, I go away`")
         await bot(LeaveChannelRequest(leave.chat_id))
 
 
 CMD_HELP.update({
-    "chatid": "Fetches the current chat's ID"
+    "chatid": "Fetch the current chat's ID"
 })
 CMD_HELP.update({
-    "userid": "Fetches the ID of the user in reply, if its a \
-forwarded message, finds the ID for the source."
+    "userid": "Fetch the ID of the user in reply or the \
+original author of a forwarded message."
 })
 CMD_HELP.update({
-    "log": "Forwards the message you've replied to in your \
-bot logs group."
+    "log": "Forward the message you've replied to to your \
+botlog group."
 })
 CMD_HELP.update({
     "kickme": "Leave from a targeted group."

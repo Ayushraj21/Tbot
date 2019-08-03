@@ -7,11 +7,12 @@
 """ Userbot module for kanging stickers or making new ones. """
 
 import io
-import math
 import urllib.request
 
+import math
 from PIL import Image
 from telethon.tl.types import DocumentAttributeFilename, MessageMediaPhoto
+
 from userbot import bot, CMD_HELP
 from userbot.events import register
 
@@ -27,6 +28,8 @@ async def kang(args):
         message = await args.get_reply_message()
         photo = None
         emojibypass = False
+        is_anim = False
+        emoji = ""
 
         if message and message.media:
             if isinstance(message.media, MessageMediaPhoto):
@@ -39,6 +42,12 @@ async def kang(args):
                         in message.media.document.attributes):
                     emoji = message.media.document.attributes[1].alt
                     emojibypass = True
+            elif (DocumentAttributeFilename(file_name='AnimatedSticker.tgs')
+                  in message.media.document.attributes):
+                emoji = message.media.document.attributes[0].alt
+                emojibypass = True
+                is_anim = True
+                photo = 1
             else:
                 await args.edit("`Unsupported File!`")
                 return
@@ -46,8 +55,8 @@ async def kang(args):
             await args.edit("`Reply to photo to kang it bruh`")
             return
 
-        if photo:        	
-            image = await resize_photo(photo)
+
+        if photo:
             splat = args.text.split()
             if not emojibypass:
                 emoji = "👻"
@@ -57,20 +66,33 @@ async def kang(args):
                 emoji = splat[1]
             elif len(splat) == 2:
                 if splat[1].isnumeric():
-                    # User wants to push into different pack, but is okay with thonk as emote.
+                    # User wants to push into different pack, but is okay with
+                    # thonk as emote.
                     pack = int(splat[1])
                 else:
-                    # User sent just custom emote, wants to push to default pack
+                    # User sent just custom emote, wants to push to default
+                    # pack
                     emoji = splat[1]
 
             packname = f"mem_pack_{pack}"
+            packnick = f"@{user.username}'s userbot pack {pack}"
+            cmd = '/newpack'
+            file = io.BytesIO()
+
+            if not is_anim:
+                image = await resize_photo(photo)
+                file.name = "sticker.png"
+                image.save(file, "PNG")
+            else:
+                packname += "_anim"
+                packnick += " animated"
+                cmd = '/newanimated'
+
             response = urllib.request.urlopen(
                 urllib.request.Request(f'https://t.me/addstickers/mem_pack_{pack}')
             )
             htmlstr = response.read().decode("utf8").split('\n')
-            file = io.BytesIO()
-            file.name = "sticker.png"
-            image.save(file, "PNG")
+
             if "  A <strong>Telegram</strong> user has created the <strong>Sticker&nbsp;Set</strong>." not in htmlstr:
                 async with bot.conversation('Stickers') as conv:
                     await conv.send_message('/addsticker')
@@ -79,10 +101,11 @@ async def kang(args):
                     await bot.send_read_acknowledge(conv.chat_id)
                     await conv.send_message(packname)
                     await conv.get_response()
-                    file.seek(0)
-                    # Ensure user doesn't get spamming notifications
-                    await bot.send_read_acknowledge(conv.chat_id)
-                    await conv.send_file(file, force_document=True)
+                    if is_anim:
+                        await bot.forward_messages('Stickers', [message.id], args.chat_id)
+                    else:
+                        file.seek(0)
+                        await conv.send_file(file, force_document=True)
                     await conv.get_response()
                     await conv.send_message(emoji)
                     # Ensure user doesn't get spamming notifications
@@ -95,25 +118,31 @@ async def kang(args):
             else:
                 await args.edit("Userbot sticker pack doesn't exist! Making a new one!")
                 async with bot.conversation('Stickers') as conv:
-                    await conv.send_message('/newpack')
+                    await conv.send_message(cmd)
                     await conv.get_response()
                     # Ensure user doesn't get spamming notifications
                     await bot.send_read_acknowledge(conv.chat_id)
-                    await conv.send_message(f"@{user.username}'s userbot pack {pack}")
+                    await conv.send_message(packnick)
                     await conv.get_response()
                     # Ensure user doesn't get spamming notifications
                     await bot.send_read_acknowledge(conv.chat_id)
-                    file.seek(0)
-                    await conv.send_file(file, force_document=True)
+                    if is_anim:
+                        await bot.forward_messages('Stickers', [message.id], args.chat_id)
+                    else:
+                        file.seek(0)
+                        await conv.send_file(file, force_document=True)
                     await conv.get_response()
                     await conv.send_message(emoji)
                     # Ensure user doesn't get spamming notifications
                     await bot.send_read_acknowledge(conv.chat_id)
                     await conv.get_response()
                     await conv.send_message("/publish")
+                    if is_anim:
+                        await conv.get_response()
+                        await conv.send_message(f"<{packnick}>")
                     # Ensure user doesn't get spamming notifications
-                    await bot.send_read_acknowledge(conv.chat_id)
                     await conv.get_response()
+                    await bot.send_read_acknowledge(conv.chat_id)
                     await conv.send_message("/skip")
                     # Ensure user doesn't get spamming notifications
                     await bot.send_read_acknowledge(conv.chat_id)
@@ -139,11 +168,11 @@ async def resize_photo(photo):
         size1 = image.width
         size2 = image.height
         if image.width > image.height:
-            scale = 512/size1
+            scale = 512 / size1
             size1new = 512
             size2new = size2 * scale
         else:
-            scale = 512/size2
+            scale = 512 / size2
             size1new = size1 * scale
             size2new = 512
         size1new = math.floor(size1new)
@@ -163,5 +192,5 @@ CMD_HELP.update({
 \nUsage: Works just like .kang but uses the emoji('s) you picked.\
 \n\n.kang [number]\
 \nUsage: Kang's the sticker/image to the specified pack but uses 🤔 as emoji.\
-\n\n\nPlease kang this. Made by @rupansh."
+\n\n\nPlease kang this."
 })

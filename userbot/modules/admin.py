@@ -23,7 +23,6 @@ from telethon.tl.types import (ChannelParticipantsAdmins, ChatAdminRights,
 from userbot import (BRAIN_CHECKER,
                      CMD_HELP, BOTLOG, BOTLOG_CHATID, bot,
                      is_mongo_alive, is_redis_alive)
-
 from userbot.events import register
 from userbot.modules.dbhelper import (mute, unmute, get_muted,
                                       gmute, ungmute, get_gmuted)
@@ -75,9 +74,11 @@ MUTE_RIGHTS = ChatBannedRights(
 )
 
 UNMUTE_RIGHTS = ChatBannedRights(
-        until_date=None,
-        send_messages=False
+    until_date=None,
+    send_messages=False
 )
+
+
 # ================================================
 
 
@@ -355,6 +356,7 @@ async def spider(spdr):
         if not is_mongo_alive() or not is_redis_alive():
             await spdr.edit(NO_SQL)
             return
+
         # Admin or creator check
         chat = await spdr.get_chat()
         admin = chat.admin_rights
@@ -369,6 +371,14 @@ async def spider(spdr):
         if user:
             pass
         else:
+            return
+
+        self_user = await spdr.client.get_me()
+
+        if user.id == self_user.id:
+            await spdr.edit(
+                "`Mute Error! You are not supposed to mute yourself!`"
+            )
             return
 
         # If the targeted user is a Sudo
@@ -836,6 +846,7 @@ async def get_user_from_id(user, event):
 
     return user_obj
 
+
 CMD_HELP.update({
     "promote": "Usage: Reply to message with .promote to promote them."
 })
@@ -861,21 +872,12 @@ groups you have in common with them."
 CMD_HELP.update({
     "ungmute": "Usage: Reply message with .ungmute to remove them from the gmuted list."
 })
-
-CMD_HELP.update(
-    {
-        "delusers": "Usage: Searches for deleted accounts in a group."
-    }
-)
-
-CMD_HELP.update(
-    {
-        "delusers clean": "Usage: Searches and removes deleted accounts from the group"
-    }
-)
-
-CMD_HELP.update(
-    {
-        "adminlist": "Usage: Retrieves all admins in the chat."
-    }
-)
+CMD_HELP.update({
+    "delusers": "Usage: Searches for deleted accounts in a group."
+})
+CMD_HELP.update({
+    "delusers clean": "Usage: Searches and removes deleted accounts from the group"
+})
+CMD_HELP.update({
+    "adminlist": "Usage: Retrieves all admins in the chat."
+})

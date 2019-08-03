@@ -6,12 +6,13 @@
 
 """ Userbot module containing commands for keeping notes. """
 
+from asyncio import sleep
+
 from userbot import (BOTLOG, BOTLOG_CHATID, CMD_HELP,
                      is_mongo_alive, is_redis_alive)
+from userbot.events import register
 from userbot.modules.dbhelper import (get_note, get_notes,
                                       add_note, delete_note)
-from userbot.events import register
-from asyncio import sleep
 
 
 @register(outgoing=True, pattern="^.saved$")
@@ -64,18 +65,17 @@ async def add_filter(event):
         notename = event.pattern_match.group(1)
         string = event.text.partition(notename)[2]
         if event.reply_to_msg_id:
-            rep_msg = await event.get_reply_message()
-            string = rep_msg.text
+            string = " " + (await event.get_reply_message()).text
 
         msg = "`Note {} successfully. Use` #{} `to get it`"
 
         if await add_note(event.chat_id, notename, string[1:]) is False:
             return await event.edit(msg.format('updated', notename))
         else:
-            return await event.edit(msg.format('addded', notename))
+            return await event.edit(msg.format('added', notename))
 
 
-@register(outgoing=True, pattern="^.note (\w*)")
+@register(outgoing=True, pattern=r"^.note (\w*)")
 async def save_note(event):
     """ For .save command, saves notes in a chat. """
     cmd = event.text[0]
@@ -93,7 +93,7 @@ async def save_note(event):
                                     .format(note, note_db["text"]))
 
 
-@register(incoming=True, pattern=r"#\w*", disable_edited=True)
+@register(pattern=r"#\w*", disable_edited=True)
 async def note(event):
     """ Notes logic. """
     try:
@@ -104,8 +104,8 @@ async def note(event):
             notename = event.text[1:]
             note = await get_note(event.chat_id, notename)
             if note:
-                    await event.reply(note["text"])
-    except:
+                await event.reply(note["text"])
+    except BaseException:
         pass
 
 
@@ -135,16 +135,17 @@ async def kick_marie_notes(kick):
         if BOTLOG:
             await kick.client.send_message(
                 BOTLOG_CHATID, "I cleaned all Notes at " +
-                str(kick.chat_id)
+                               str(kick.chat_id)
             )
+
 
 CMD_HELP.update({
     "notes": "\
 #<notename>\
-\nUsage: Gets the note with name notename\
+\nUsage: Get the note with name notename\
 \n\n.save <notename> <notedata>\
-\nUsage: Saves notedata as a note with the name notename\
+\nUsage: Save notedata as a note with the name notename\
 \n\n.clear <notename>\
-\nUsage: Deletes the note with name notename.\
+\nUsage: Delete the note with name notename.\
 "
 })

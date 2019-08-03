@@ -7,14 +7,14 @@
 
 from asyncio import create_subprocess_shell as asyncrunapp
 from asyncio.subprocess import PIPE as asyncPIPE
+from os import remove
 from platform import python_version, uname
 from shutil import which
 from os import remove
 from telethon import version
 
-from userbot import CMD_HELP, MONGO, REDIS, is_mongo_alive, is_redis_alive
+from userbot import CMD_HELP, is_mongo_alive, is_redis_alive
 from userbot.events import register
-
 
 # ================= CONSTANT =================
 DEFAULTUSER = uname().node
@@ -45,7 +45,8 @@ async def sysdetails(sysd):
 @register(outgoing=True, pattern="^.botver$")
 async def bot_ver(event):
     """ For .botver command, get the bot version. """
-    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in (
+            "/", "#", "@", "!"):
         if which("git") is not None:
             invokever = "git describe --all --long"
             ver = await asyncrunapp(
@@ -144,13 +145,14 @@ async def amireallyalive(e):
             f"User:             {DEFAULTUSER} \n"
             f"Database Status:  {db}"
             "`"
-            )
+        )
 
 
 @register(outgoing=True, pattern="^.aliveu")
 async def amireallyaliveuser(username):
     """ For .aliveu command, change the username in the .alive command. """
-    if not username.text[0].isalpha() and username.text[0] not in ("/", "#", "@", "!"):
+    if not username.text[0].isalpha(
+    ) and username.text[0] not in ("/", "#", "@", "!"):
         message = username.text
         output = '.aliveu [new user without brackets] nor can it be empty'
         if not (message == '.aliveu' or message[7:8] != ' '):
@@ -168,7 +170,8 @@ async def amireallyaliveuser(username):
 @register(outgoing=True, pattern="^.resetalive$")
 async def amireallyalivereset(ureset):
     """ For .resetalive command, reset the username in the .alive command. """
-    if not ureset.text[0].isalpha() and ureset.text[0] not in ("/", "#", "@", "!"):
+    if not ureset.text[0].isalpha() and ureset.text[0] not in (
+            "/", "#", "@", "!"):
         global DEFAULTUSER
         DEFAULTUSER = uname().node
         await ureset.edit(
@@ -177,20 +180,22 @@ async def amireallyalivereset(ureset):
             "`"
         )
 
+
 CMD_HELP.update({
     "sysd": ".sysd\
-    \nUsage: Shows system information using neofetch."
+    \nUsage: Show system information using neofetch."
 })
 CMD_HELP.update({
     "botver": ".botver\
-    \nUsage: Shows the userbot version."
+    \nUsage: Show the userbot version."
 })
 CMD_HELP.update({
     "pip": ".pip <module(s)>\
-    \nUsage: Does a search of pip modules(s)."
+    \nUsage: Search module(s) in PyPi."
 })
 CMD_HELP.update({
     "alive": ".alive\
-    \nUsage: It's used to check if your bot is working or not. \
-Use .aliveu <new_user> to change user or .resetalive to reset .alive."
+    \nUsage: Check if your bot is working or not. \
+Use .aliveu <new_user> to change user name, or .resetalive \
+to reset it to default."
 })

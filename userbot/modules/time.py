@@ -17,6 +17,8 @@ from userbot.events import register
 
 # ===== CONSTANT =====
 COUNTRY = ''
+
+
 # ===== CONSTANT =====
 
 
@@ -52,7 +54,8 @@ async def time_func(tdata):
         2. The default userbot country(set it by using .ctime),
         3. The server where the userbot runs.
     """
-    if not tdata.text[0].isalpha() and tdata.text[0] not in ("/", "#", "@", "!"):
+    if not tdata.text[0].isalpha() and tdata.text[0] not in (
+            "/", "#", "@", "!"):
         con = tdata.pattern_match.group(1).title()
         t_form = "%I:%M %p"
 
@@ -136,15 +139,16 @@ async def set_time_country(loc):
 
         await loc.edit(f"``` Default country for date and time set to {COUNTRY} successfully! ```")
 
+
 CMD_HELP.update({
     "time": ".time <country name/code>\
-    \nUsage: Gets the time of a country."
+    \nUsage: Get the time of a country."
 })
 CMD_HELP.update({
     "date": ".date <country name/code>\
-    \nUsage: Gets the date of a country."
+    \nUsage: Get the date of a country."
 })
 CMD_HELP.update({
     "ctime": ".ctime <country name/code>\
-    \nUsage: Sets a default country for your userbot so you can do .time/.date."
+    \nUsage: Set the default country for .time and .date command."
 })
