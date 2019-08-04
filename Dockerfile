@@ -70,7 +70,7 @@ WORKDIR /home/userbot/userbot
 #
 #Copies session and configs (if it exists)
 #
-
+COPY ./client_secrets.json ./secret.json* /home/userbot/userbot/
 
 #
 # Finalization
