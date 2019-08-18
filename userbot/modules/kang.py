@@ -22,7 +22,7 @@ async def kang(args):
     """ For .kang command, kangs stickers or creates new ones. """
     if not args.text[0].isalpha() and args.text[0] not in ("/", "#", "@", "!"):   	
         user = await bot.get_me() 
-        await args.edit("processing kang...")
+        await args.edit("sticker is being cherry-picked...")
         if not user.username:
             user.username = user.first_name
         message = await args.get_reply_message()
