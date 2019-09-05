@@ -9,15 +9,16 @@ from requests import get
 from telethon.errors import AboutTooLongError
 from telethon.tl.functions.account import UpdateProfileRequest
 
-from userbot import (DEFAULT_BIO, CMD_HELP, BOTLOG, BOTLOG_CHATID,
-                     SPOTIFY_BIO_PREFIX, SPOTIFY_PASS, SPOTIFY_USERNAME, bot)
-from userbot.events import register
+from userbot import (DEFAULT_BIO, CMD_HELP, BOTLOG, BOTLOG_CHATID, BIO_PREFIX,
+                     SPOTIFY_PASS, SPOTIFY_USERNAME, bot)
+from userbot.events import register, errors_handler
 
 # =================== CONSTANT ===================
-SPO_BIO_ENABLED = "```Spotify current music to bio is now enabled.```"
-SPO_BIO_DISABLED = "```Spotify current music to bio is now disabled. Bio reverted to default.```"
-SPO_BIO_RUNNING = "```Spotify current music to bio is already running.```"
-ERROR_MSG = "```Spotify module halted, got an unexpected error.```"
+SPO_BIO_ENABLED = "`Spotify current music to bio is now enabled.`"
+SPO_BIO_DISABLED = "`Spotify current music to bio is now disabled. "
+SPO_BIO_DISABLED += "Bio reverted to default.`"
+SPO_BIO_RUNNING = "`Spotify current music to bio is already running.`"
+ERROR_MSG = "`Spotify module halted, got an unexpected error.`"
 
 USERNAME = SPOTIFY_USERNAME
 PASSWORD = SPOTIFY_PASS
@@ -25,7 +26,7 @@ PASSWORD = SPOTIFY_PASS
 ARTIST = 0
 SONG = 0
 
-BIOPREFIX = SPOTIFY_BIO_PREFIX
+BIOPREFIX = BIO_PREFIX
 
 SPOTIFYCHECK = False
 RUNNING = False
@@ -34,8 +35,6 @@ PARSE = False
 
 
 # ================================================
-
-
 async def get_spotify_token():
     sptoken = st.start_session(USERNAME, PASSWORD)
     access_token = sptoken[0]
@@ -82,9 +81,7 @@ async def update_spotify_info():
                 await bot(UpdateProfileRequest(about=DEFAULT_BIO))
                 print(ERROR_MSG)
                 if BOTLOG:
-                    await bot.send_message(
-                        BOTLOG_CHATID,
-                        ERROR_MSG)
+                    await bot.send_message(BOTLOG_CHATID, ERROR_MSG)
         except JSONDecodeError:
             OLDEXCEPT = True
             await sleep(6)
@@ -113,6 +110,7 @@ async def dirtyfix():
 
 
 @register(outgoing=True, pattern="^.enablespotify$")
+@errors_handler
 async def set_biostgraph(setstbio):
     setrecursionlimit(700000)
     if not SPOTIFYCHECK:
@@ -125,6 +123,7 @@ async def set_biostgraph(setstbio):
 
 
 @register(outgoing=True, pattern="^.disablespotify$")
+@errors_handler
 async def set_biodgraph(setdbio):
     global SPOTIFYCHECK
     global RUNNING
@@ -133,11 +132,6 @@ async def set_biodgraph(setdbio):
     await bot(UpdateProfileRequest(about=DEFAULT_BIO))
     await setdbio.edit(SPO_BIO_DISABLED)
 
+CMD_HELP.update({"enablespotify": "Usage: Enable Spotify bio updating."})
 
-CMD_HELP.update({
-    "enablespotify": "Usage: Enable Spotify bio updating."
-})
-
-CMD_HELP.update({
-    "disablespotify": "Usage: Disable Spotify bio updating."
-})
+CMD_HELP.update({"disablespotify": "Usage: Disable Spotify bio updating."})
