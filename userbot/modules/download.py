@@ -238,7 +238,6 @@ async def download(target_file):
     else:
         await target_file.edit("`Reply to a message to \
             download to my local server.`\n")
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
 
 
 @register(pattern=r"^.uploadir (.*)", outgoing=True)

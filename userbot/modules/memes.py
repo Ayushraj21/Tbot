@@ -190,10 +190,7 @@ RUNSREACTS = [
 ]
 DISABLE_RUN = False
 
-<<<<<<< HEAD
 
-=======
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
 # ===========================================
 
 

@@ -86,14 +86,6 @@ async def repo_is_here(wannasee):
     """ For .repo command, just returns the repo URL. """
     await wannasee.edit("https://github.com/RaphielGang/Telegram-UserBot/")
 
-<<<<<<< HEAD
-
-CMD_HELP.update({
-    'random': '.random <item1> <item2> ... <itemN>\
-\nUsage: Get a random item from the list of items.'
-})
-=======
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
 
 CMD_HELP.update({
     'random':
@@ -119,12 +111,7 @@ CMD_HELP.update(
      "\nUsage: If you need help, use this command."})
 
 CMD_HELP.update({
-<<<<<<< HEAD
-    'repo': '.repo\
-\nUsage: If you are curious what makes Paperplane work, this is what you need.'
-=======
     'repo':
     '.repo'
     '\nUsage: If you are curious what makes Paperplane work, this is what you need.'
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
 })
