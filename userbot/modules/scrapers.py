@@ -12,7 +12,6 @@ from html import unescape
 from re import findall
 from urllib import parse
 from urllib.error import HTTPError
-from googlesearch import search
 from search_engine_parser import GoogleSearch
 from emoji import get_emoji_regexp
 from google_images_download import google_images_download
