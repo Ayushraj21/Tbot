@@ -6,6 +6,7 @@
 """ Userbot initialization. """
 
 import os
+import pylast
 from distutils.util import strtobool as sb
 from logging import basicConfig, getLogger, INFO, DEBUG
 from sys import version_info
@@ -13,6 +14,7 @@ from sys import version_info
 import redis
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from telethon.sessions import StringSession
 from requests import get
 from telethon import TelegramClient
 
