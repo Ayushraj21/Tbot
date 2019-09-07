@@ -12,11 +12,8 @@ from html import unescape
 from re import findall
 from urllib import parse
 from urllib.error import HTTPError
-<<<<<<< HEAD
-
-=======
 from googlesearch import search
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
+from search_engine_parser import GoogleSearch
 from emoji import get_emoji_regexp
 from google_images_download import google_images_download
 from googleapiclient.discovery import build
@@ -74,19 +71,33 @@ async def img_sampler(event):
 @errors_handler
 async def gsearch(q_event):
     """ For .google command, do a Google search. """
-    await q_event.edit("`Searching...`")
-    match_ = q_event.pattern_match.group(1)
-    match = parse.quote_plus(match_)
-    result = ""
-    for i in search(match, stop=8):
-        result += i
-        result += "\n"
-    await q_event.edit("**Search Query:**\n`" + match_ + "`\n\n**Result:**\n" +
-                       result)
+    match = q_event.pattern_match.group(1)
+    page = findall(r"page=\d+", match)
+    try:
+        page = page[0]
+        page = page.replace("page=", "")
+        match = match.replace("page=" + page[0], "")
+    except IndexError:
+        page = 1
+    search_args = (str(match), int(page))
+    gsearch = GoogleSearch()
+    gresults = gsearch.search(*search_args)
+    msg = ""
+    for i in range(10):
+        try:
+            title = gresults["titles"][i]
+            link = gresults["links"][i]
+            desc = gresults["descriptions"][i]
+            msg += f"{i}. [{title}]({link})\n`{desc}`\n\n"
+        except IndexError:
+            break
+    await q_event.edit("**Search Query:**\n`" + match + "`\n\n**Results:**\n" +
+                       msg,
+                       link_preview=False)
     if BOTLOG:
         await q_event.client.send_message(
             BOTLOG_CHATID,
-            "Google Search query " + match_ + " was executed successfully",
+            "Google Search query `" + match + "` was executed successfully",
         )
 
 
@@ -244,7 +255,7 @@ async def translateme(trans):
         )
 
 
-@register(pattern=".lang (.*)", outgoing=True)
+@register(pattern="^.lang (.*)", outgoing=True)
 @errors_handler
 async def lang(value):
     """ For .lang command, change the default langauge of userbot scrapers. """
@@ -260,43 +271,6 @@ async def lang(value):
 @errors_handler
 async def yt_search(video_q):
     """ For .yt command, do a YouTube search from Telegram. """
-<<<<<<< HEAD
-    if not video_q.text[0].isalpha() and video_q.text[0] not in (
-            "/", "#", "@", "!"):
-        query = video_q.pattern_match.group(1)
-        result = ''
-        i = 1
-
-        if not YOUTUBE_API_KEY:
-            await video_q.edit(
-                "`Error: YouTube API key missing!\
-                Add it to environment vars or config.env.`"
-            )
-            return
-
-        await video_q.edit("```Processing...```")
-
-        full_response = youtube_search(query)
-        videos_json = full_response[1]
-
-        for video in videos_json:
-            result += f"{i}. {unescape(video['snippet']['title'])} \
-                \nhttps://www.youtube.com/watch?v={video['id']['videoId']}\n"
-            i += 1
-
-        reply_text = f"**Search Query:**\n`{query}`\n\n**Result:**\n{result}"
-
-        await video_q.edit(reply_text)
-
-
-def youtube_search(
-        query,
-        order="relevance",
-        token=None,
-        location=None,
-        location_radius=None
-):
-=======
     query = video_q.pattern_match.group(1)
     result = ''
     i = 1
@@ -327,7 +301,6 @@ def youtube_search(query,
                    token=None,
                    location=None,
                    location_radius=None):
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
     """ Do a YouTube search. """
     youtube = build('youtube',
                     'v3',
@@ -359,82 +332,10 @@ def youtube_search(query,
         return (nexttok, videos)
 
 
-@register(outgoing=True, pattern=r".yt_dl (\S*) ?(\S*)")
+@register(outgoing=True, pattern=r"^.yt_dl (\S*) ?(\S*)")
 @errors_handler
 async def download_video(v_url):
     """ For .yt_dl command, download videos from YouTube. """
-<<<<<<< HEAD
-    if not v_url.text[0].isalpha() and v_url.text[0] not in (
-            "/", "#", "@", "!"):
-        url = v_url.pattern_match.group(1)
-        quality = v_url.pattern_match.group(2)
-
-        await v_url.edit("**Fetching...**")
-
-        video = YouTube(url)
-
-        if quality:
-            video_stream = video.streams.filter(
-                progressive=True,
-                subtype="mp4",
-                res=quality
-            ).first()
-        else:
-            video_stream = video.streams.filter(
-                progressive=True,
-                subtype="mp4"
-            ).first()
-
-        if video_stream is None:
-            all_streams = video.streams.filter(
-                progressive=True,
-                subtype="mp4"
-            ).all()
-            available_qualities = ""
-
-            for item in all_streams[:-1]:
-                available_qualities += f"{item.resolution}, "
-            available_qualities += all_streams[-1].resolution
-
-            await v_url.edit(
-                "**A stream matching your query wasn't found. Try again with different options.\n**"
-                "**Available Qualities:**\n"
-                f"{available_qualities}"
-            )
-            return
-
-        video_size = video_stream.filesize / 1000000
-
-        if video_size >= 50:
-            await v_url.edit(
-                ("**File larger than 50MB. Sending the link instead.\n**"
-                 f"Get the video [here]({video_stream.url})\n\n"
-                 "**If the video plays instead of downloading, right click(or long press on touchscreen) and "
-                 "press 'Save Video As...'(may depend on the browser) to download the video.**")
-            )
-            return
-
-        await v_url.edit("**Downloading...**")
-
-        video_stream.download(filename=video.title)
-
-        url = f"https://img.youtube.com/vi/{video.video_id}/maxresdefault.jpg"
-        resp = get(url)
-        with open('thumbnail.jpg', 'wb') as file:
-            file.write(resp.content)
-
-        await v_url.edit("**Uploading...**")
-        await bot.send_file(
-            v_url.chat_id,
-            f'{safe_filename(video.title)}.mp4',
-            caption=f"{video.title}",
-            thumb="thumbnail.jpg"
-        )
-
-        os.remove(f"{safe_filename(video.title)}.mp4")
-        os.remove('thumbnail.jpg')
-        await v_url.delete()
-=======
     url = v_url.pattern_match.group(1)
     quality = v_url.pattern_match.group(2)
 
@@ -497,7 +398,7 @@ async def download_video(v_url):
     await v_url.delete()
 
 
-@register(outgoing=True, pattern=r".cr (\S*) ?(\S*) ?(\S*)")
+@register(outgoing=True, pattern=r"^.cr (\S*) ?(\S*) ?(\S*)")
 @errors_handler
 async def currency(cconvert):
     """ For .cr command, convert amount, from, to. """
@@ -512,7 +413,6 @@ async def currency(cconvert):
     result = round(result, 5)
     await cconvert.edit(
         f"{amount} {currency_to} is:\n`{result} {currency_from}`")
->>>>>>> d22ae5a8e7b4cf7ba7b9d43d3ea5a801ea3e63d6
 
 
 def deEmojify(inputString):
