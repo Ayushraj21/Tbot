@@ -365,7 +365,6 @@ async def spider(spdr):
         # These indicate we couldn't hit him an API mute, possibly an
         # admin?
 
-
         except (UserAdminInvalidError, ChatAdminRequiredError,
                 BadRequestError):
             return await spdr.edit("""`I couldn't mute on the API,
@@ -373,6 +372,7 @@ async def spider(spdr):
             Anyways muted on the userbot.
             I'll automatically delete messages
             in this chat from this person`""")
+
 
 @register(outgoing=True, pattern="^.unmute(?: |$)(.*)")
 @errors_handler
@@ -768,6 +768,7 @@ async def get_user_from_id(user, event):
         return None
 
     return user_obj
+
 
 CMD_HELP.update(
     {"promote": "Usage: Reply to message with .promote to promote them."})

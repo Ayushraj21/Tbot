@@ -53,7 +53,6 @@ async def download_from_url(url: str, file_name: str) -> str:
     return status
 
 
-
 async def download_from_tg(target_file) -> (str, BytesIO):
     """
     Download files from Telegram
@@ -494,15 +493,6 @@ async def uploadas(uas_event):
         await uas_event.edit("404: File Not Found")
 
 
-
-CMD_HELP.update({
-    "download": ".download [in reply to TG file]\n"
-                "or .download <link> | <filename>\n"
-                "Usage: Download a file from telegram or link to the server."
-})
-CMD_HELP.update({
-    "upload": ".upload <link>\nUsage: Upload a locally stored file to Telegram."
-})
 CMD_HELP.update({
     "download":
     ".download [in reply to TG file]\n"

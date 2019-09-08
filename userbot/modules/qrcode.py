@@ -16,6 +16,7 @@ from requests import post, get
 from userbot import CMD_HELP
 from userbot.events import register, errors_handler
 
+
 def progress(current, total):
     """ Calculate and return the download progress with given arguments. """
     print("Downloaded {} of {}\nCompleted {}".format(current, total,
@@ -26,7 +27,6 @@ def progress(current, total):
 @errors_handler
 async def parseqr(qr_e):
     """ For .getqr command, get QR Code content from the replied photo. """
-
     if qr_e.fwd_from:
         return
     start = datetime.now()

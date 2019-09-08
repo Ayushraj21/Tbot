@@ -132,6 +132,7 @@ async def set_biodgraph(setdbio):
     await bot(UpdateProfileRequest(about=DEFAULT_BIO))
     await setdbio.edit(SPO_BIO_DISABLED)
 
+
 CMD_HELP.update({"enablespotify": "Usage: Enable Spotify bio updating."})
 
 CMD_HELP.update({"disablespotify": "Usage: Disable Spotify bio updating."})

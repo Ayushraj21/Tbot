@@ -12,6 +12,7 @@ from userbot import (BOTLOG, BOTLOG_CHATID, CMD_HELP, is_mongo_alive,
 from userbot.events import register, errors_handler
 from userbot.modules.dbhelper import (get_filters, add_filter, delete_filter)
 
+
 @register(incoming=True, disable_edited=True)
 async def filter_incoming_handler(handler):
     """ Checks if the incoming message contains handler of a filter """
@@ -75,12 +76,12 @@ async def remove_filter(event):
         await event.edit(
             "`Filter` **{}** `was deleted successfully`".format(filt))
 
+
 @register(outgoing=True, pattern="^.rmfilters (.*)")
 @errors_handler
 async def kick_marie_filter(event):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
-
     bot_type = event.pattern_match.group(1)
     if bot_type not in ["marie", "rose"]:
         await event.edit("`That bot is not yet supported!`")
@@ -101,6 +102,7 @@ async def kick_marie_filter(event):
     if BOTLOG:
         await event.client.send_message(
             BOTLOG_CHATID, "I cleaned all filters at " + str(event.chat_id))
+
 
 @register(outgoing=True, pattern="^.filters$")
 @errors_handler

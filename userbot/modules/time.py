@@ -244,9 +244,7 @@ async def set_time_country(loc):
                    f"{c_name}({tz_name} timezone).`")
 
 
-
 CMD_HELP.update({
-
     "time":
     ".time <country name/code> <timezone number>"
     "\nUsage: Get the time of a country. If a country has "

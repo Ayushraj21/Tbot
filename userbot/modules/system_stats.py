@@ -10,7 +10,7 @@ from asyncio.subprocess import PIPE as asyncPIPE
 from os import remove
 from platform import python_version, uname
 from shutil import which
-from os import remove
+
 from telethon import version
 
 from userbot import CMD_HELP, is_mongo_alive, is_redis_alive
@@ -139,12 +139,13 @@ async def amireallyalive(e):
     else:
         db = "Databases functioning normally!"
     await e.edit("`"
-                 "Bot is walking \n\n"
+                 "Your bot is running \n\n"
                  f"Telethon version: {version.__version__} \n"
                  f"Python: {python_version()} \n"
                  f"User: {DEFAULTUSER} \n"
                  f"Database Status: {db}"
                  "`")
+
 
 @register(outgoing=True, pattern="^.aliveu")
 @errors_handler
@@ -171,6 +172,7 @@ async def amireallyalivereset(ureset):
         global DEFAULTUSER
         DEFAULTUSER = uname().node
         await ureset.edit("`" "Successfully reset user for alive!" "`")
+
 
 CMD_HELP.update(
     {"sysd": ".sysd"

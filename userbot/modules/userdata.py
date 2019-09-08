@@ -130,7 +130,6 @@ async def remove_profilepic(delpfp):
 
 
 CMD_HELP.update({
-
     "username":
     ".username <new_username>"
     "\nUsage: Change your Telegram username."

@@ -190,7 +190,6 @@ RUNSREACTS = [
 ]
 DISABLE_RUN = False
 
-
 # ===========================================
 
 
@@ -291,6 +290,7 @@ async def vapor(vpr):
 
     await vpr.edit("".join(reply_text))
 
+
 @register(outgoing=True, pattern="^.str(?: |$)(.*)")
 @errors_handler
 async def stretch(stret):
@@ -316,7 +316,6 @@ async def stretch(stret):
 @errors_handler
 async def zal(zgfy):
     """ Invoke the feeling of chaos. """
-
     reply_text = list()
     textx = await zgfy.get_reply_message()
     message = zgfy.pattern_match.group(1)
@@ -329,6 +328,7 @@ async def zal(zgfy):
             "`gͫ ̆ i̛ ̺ v͇̆ ȅͅ   a̢ͦ   s̴̪ c̸̢ ä̸ rͩͣ y͖͞   t̨͚ é̠ x̢͖  t͔͛`"
         )
         return
+
     for charac in message:
         if not charac.isalpha():
             reply_text.append(charac)
@@ -435,6 +435,7 @@ async def metoo(hahayes):
     reply_text = random.choice(METOOSTR)
     await hahayes.edit(reply_text)
 
+
 @register(outgoing=True, pattern="^.mock(?: |$)(.*)")
 @errors_handler
 async def spongemocktext(mock):
@@ -458,6 +459,7 @@ async def spongemocktext(mock):
             reply_text.append(charac)
 
     await mock.edit("".join(reply_text))
+
 
 @register(outgoing=True, pattern="^.clap(?: |$)(.*)")
 @errors_handler

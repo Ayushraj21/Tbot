@@ -54,6 +54,7 @@ async def kang(args):
     else:
         await args.edit("`Reply to photo to kang it bruh`")
         return
+
     if photo:
         splat = args.text.split()
         if not emojibypass:
@@ -72,7 +73,7 @@ async def kang(args):
                 # pack
                 emoji = splat[1]
 
-        packname = f"mem_pack_{pack}"
+        packname = f"a{user.id}_by_{user.username}_{pack}"
         packnick = f"@{user.username}'s userbot pack {pack}"
         cmd = '/newpack'
         file = io.BytesIO()
@@ -87,7 +88,7 @@ async def kang(args):
             cmd = '/newanimated'
 
         response = urllib.request.urlopen(
-            urllib.request.Request(f'http://t.me/addstickers/mem_pack_{pack}'))
+            urllib.request.Request(f'http://t.me/addstickers/{packname}'))
         htmlstr = response.read().decode("utf8").split('\n')
 
         if "  A <strong>Telegram</strong> user has created the <strong>Sticker&nbsp;Set</strong>." not in htmlstr:
@@ -100,7 +101,7 @@ async def kang(args):
                 x = await conv.get_response()
                 while x.text == PACK_FULL:
                     pack += 1
-                    packname = f"mem_pack_new{pack}"
+                    packname = f"a{user.id}_by_{user.username}_{pack}"
                     packnick = f"@{user.username}'s userbot pack {pack}"
                     await args.edit("`Switching to Pack " + str(pack) +
                                     " due to insufficient space`")
@@ -207,6 +208,7 @@ doesn't exist! Making a new one!")
         await args.edit(
             f"Sticker added! Your pack can be found [here](t.me/addstickers/{packname})",
             parse_mode='md')
+
 
 async def resize_photo(photo):
     """ Resize the given photo to 512x512 """

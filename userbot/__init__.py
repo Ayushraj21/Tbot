@@ -6,11 +6,12 @@
 """ Userbot initialization. """
 
 import os
-import pylast
 from distutils.util import strtobool as sb
 from logging import basicConfig, getLogger, INFO, DEBUG
 from sys import version_info
 
+from pyDownload import Downloader
+import pylast
 import redis
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -18,7 +19,7 @@ from telethon.sessions import StringSession
 from requests import get
 from telethon import TelegramClient
 
-load_dotenv("config.env")
+#load_dotenv("config.env")
 
 # Bot Logs setup:
 CONSOLE_LOGGER_VERBOSE = sb(os.environ.get("CONSOLE_LOGGER_VERBOSE", "False"))
@@ -49,8 +50,6 @@ if CONFIG_CHECK:
 
 API_KEY = os.environ.get("API_KEY", None)
 
-STRING_SESSION = os.environ.get("STRING_SESSION", None)
-
 API_HASH = os.environ.get("API_HASH", None)
 
 BOTLOG_CHATID = int(os.environ.get("BOTLOG_CHATID", "0"))
@@ -58,6 +57,8 @@ BOTLOG_CHATID = int(os.environ.get("BOTLOG_CHATID", "0"))
 BOTLOG = sb(os.environ.get("BOTLOG", "False"))
 
 PM_AUTO_BAN = sb(os.environ.get("PM_AUTO_BAN", "False"))
+
+STRING_SESSION = os.environ.get("STRING_SESSION", None)
 
 CONSOLE_LOGGER_VERBOSE = sb(os.environ.get("CONSOLE_LOGGER_VERBOSE", "False"))
 
@@ -94,8 +95,10 @@ CURRENCY_API = os.environ.get("CURRENCY_API", None)
 
 GDRIVE_FOLDER = os.environ.get("GDRIVE_FOLDER", None)
 
-# pylint: disable=invalid-name
 bot = TelegramClient(StringSession(STRING_SESSION), API_KEY, API_HASH)
+
+# pylint: disable=invalid-name
+bot = TelegramClient("userbot", API_KEY, API_HASH)
 
 if os.path.exists("learning-data-root.check"):
     os.remove("learning-data-root.check")
@@ -135,6 +138,19 @@ def is_redis_alive():
         return False
 
 
+# Download binaries for gen_direct_links module, give correct perms
+if not os.path.exists('bin'):
+    os.mkdir('bin')
+
+url1 = 'https://raw.githubusercontent.com/yshalsager/megadown/master/megadown'
+url2 = 'https://raw.githubusercontent.com/yshalsager/cmrudl.py/master/cmrudl.py'
+
+dl1 = Downloader(url=url1, filename="bin/megadown")
+dl1 = Downloader(url=url1, filename="bin/cmrudl")
+
+os.chmod('bin/megadown', 0o755)
+os.chmod('bin/cmrudl', 0o755)
+
 # Global Variables
 COUNT_MSG = 0
 BRAIN_CHECKER = []
@@ -144,7 +160,6 @@ LASTMSG = {}
 ENABLE_KILLME = True
 CMD_HELP = {}
 AFKREASON = "no reason"
-
 ZALG_LIST = [[
     "̖",
     " ̗",

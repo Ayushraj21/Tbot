@@ -75,7 +75,6 @@ async def add_filter(event):
 @errors_handler
 async def save_note(event):
     """ For .save command, saves notes in a chat. """
-
     if not is_mongo_alive() or not is_redis_alive():
         await event.edit("`Database connections failing!`")
         return
@@ -109,7 +108,6 @@ async def note(event):
 async def kick_marie_notes(kick):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
-
     bot_type = kick.pattern_match.group(1)
     if bot_type not in ["marie", "rose"]:
         await kick.edit("`That bot is not yet supported!`")
