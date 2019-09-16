@@ -19,7 +19,7 @@ from telethon.sessions import StringSession
 from requests import get
 from telethon import TelegramClient
 
-#load_dotenv("config.env")
+load_dotenv("config.env")
 
 # Bot Logs setup:
 CONSOLE_LOGGER_VERBOSE = sb(os.environ.get("CONSOLE_LOGGER_VERBOSE", "False"))
@@ -98,7 +98,7 @@ GDRIVE_FOLDER = os.environ.get("GDRIVE_FOLDER", None)
 bot = TelegramClient(StringSession(STRING_SESSION), API_KEY, API_HASH)
 
 # pylint: disable=invalid-name
-bot = TelegramClient("userbot", API_KEY, API_HASH)
+#bot = TelegramClient("userbot", API_KEY, API_HASH)
 
 if os.path.exists("learning-data-root.check"):
     os.remove("learning-data-root.check")
