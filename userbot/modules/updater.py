@@ -7,13 +7,14 @@
 This module updates the userbot based on Upstream revision
 """
 
-from os import remove, execl
 import sys
+from os import execl, remove
+
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 
 from userbot import CMD_HELP
-from userbot.events import register, errors_handler
+from userbot.events import register
 
 
 async def gen_chlog(repo, diff):
@@ -32,7 +33,6 @@ async def is_off_br(br):
 
 
 @register(outgoing=True, pattern="^.update(?: |$)(.*)")
-@errors_handler
 async def upstream(ups):
     "For .update command, check if the bot is up to date, update if specified"
     await ups.edit("`Checking for updates, please wait....`")

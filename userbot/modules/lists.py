@@ -6,11 +6,12 @@
 """ Userbot module containing commands for keeping lists. """
 
 import re
+
 from userbot import (BOTLOG, BOTLOG_CHATID, CMD_HELP, is_mongo_alive,
                      is_redis_alive)
-from userbot.modules.dbhelper import (get_list, get_lists, add_list,
-                                      delete_list, set_list)
-from userbot.events import register, errors_handler
+from userbot.events import register
+from userbot.modules.dbhelper import (add_list, delete_list, get_list,
+                                      get_lists, set_list)
 
 # =================== CONSTANTS ===================
 
@@ -24,7 +25,6 @@ LIST_HEADER = "[Paperplane-List] List **{}({})**\n\n"
 
 
 @register(outgoing=True, pattern="^.lists$")
-@errors_handler
 async def lists_active(event):
     """ For .lists command, list all of the lists saved in a chat. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -45,7 +45,6 @@ async def lists_active(event):
 
 
 @register(outgoing=True, pattern=r"^.dellist ?(\w*)")
-@errors_handler
 async def removelists(event):
     """ For .dellist command, delete list with the given name."""
     if not is_mongo_alive() or not is_redis_alive():
@@ -81,7 +80,6 @@ async def removelists(event):
 
 
 @register(outgoing=True, pattern=r"^.add(g)?list (\w*)")
-@errors_handler
 async def addlist(event):
     """ For .add(g)list command, saves lists in a chat. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -109,7 +107,6 @@ async def addlist(event):
 
 
 @register(outgoing=True, pattern=r"^.addlistitem(s)? ?(\w*)\n((.|\n*)*)")
-@errors_handler
 async def add_list_items(event):
     """ For .addlistitems command, add item(s) to a list. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -161,7 +158,6 @@ async def add_list_items(event):
 
 
 @register(outgoing=True, pattern=r"^.editlistitem ?(\w*)? ([0-9]+) (.*)")
-@errors_handler
 async def edit_list_item(event):
     """ For .editlistitem command, edit an individual item on a list. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -203,7 +199,6 @@ async def edit_list_item(event):
 
 
 @register(outgoing=True, pattern=r"^.rmlistitem ?(\w*)? ([0-9]+)")
-@errors_handler
 async def rmlistitems(event):
     """ For .rmlistitem command, remove an item from the list. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -255,7 +250,6 @@ Use` ${} `to get the list.`"
 
 
 @register(outgoing=True, pattern=r"^.setlist ?(\w*)? (global|local)")
-@errors_handler
 async def setliststate(event):
     """ For .setlist command, changes the state of a list. """
     if not is_mongo_alive() or not is_redis_alive():
@@ -300,7 +294,10 @@ async def setliststate(event):
             f"Changed state of list {listname} to {_futureState}")
 
 
-@register(pattern=r"\$\w*", disable_edited=True, ignore_unsafe=True)
+@register(pattern=r"\$\w*",
+          disable_edited=True,
+          ignore_unsafe=True,
+          disable_errors=True)
 async def lists_logic(event):
     """ Lists logic. """
     try:
@@ -333,7 +330,6 @@ async def lists_logic(event):
 
 
 @register(pattern=r"^.getlist ?(\w*)?")
-@errors_handler
 async def getlist_logic(event):
     """ For .getlist, get the list by the name. """
     if not (await event.get_sender()).bot:
