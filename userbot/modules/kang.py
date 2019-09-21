@@ -30,7 +30,7 @@ async def kang(args):
     emojibypass = False
     is_anim = False
     emoji = ""
-    await args.edit("`Kanging..........`")
+    await args.edit("`sticker is being cherry-picked`")
     if message and message.media:
         if isinstance(message.media, MessageMediaPhoto):
             photo = io.BytesIO()
@@ -73,7 +73,7 @@ async def kang(args):
                 # pack
                 emoji = splat[1]
 
-        packname = f"a{user.id}_by_{user.username}_{pack}"
+        packname = f"mem_pack_{pack}"
         packnick = f"@{user.username}'s userbot pack {pack}"
         cmd = '/newpack'
         file = io.BytesIO()
@@ -88,7 +88,7 @@ async def kang(args):
             cmd = '/newanimated'
 
         response = urllib.request.urlopen(
-            urllib.request.Request(f'http://t.me/addstickers/{packname}'))
+            urllib.request.Request(f'http://t.me/addstickers/mem_pack_{pack}'))
         htmlstr = response.read().decode("utf8").split('\n')
 
         if "  A <strong>Telegram</strong> user has created the <strong>Sticker&nbsp;Set</strong>." not in htmlstr:
@@ -101,7 +101,7 @@ async def kang(args):
                 x = await conv.get_response()
                 while x.text == PACK_FULL:
                     pack += 1
-                    packname = f"a{user.id}_by_{user.username}_{pack}"
+                    packname = f"mem_pack_{pack}"
                     packnick = f"@{user.username}'s userbot pack {pack}"
                     await args.edit("`Switching to Pack " + str(pack) +
                                     " due to insufficient space`")
