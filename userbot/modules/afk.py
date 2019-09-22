@@ -99,6 +99,7 @@ async def set_afk(setafk):
 async def type_afk_is_not_true(notafk):
     global COUNT_MSG
     global USERS
+    global AFKREASON
     if not is_redis_alive():
         return
     IsAway = await is_afk()
