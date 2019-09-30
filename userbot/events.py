@@ -18,8 +18,7 @@ from traceback import format_exc
 
 from telethon import events
 
-from userbot import bot, BRAIN_CHECKER
-from telethon.tl.types import ChannelParticipantsAdmins
+from userbot import bot
 
 
 def register(**args):
@@ -30,8 +29,6 @@ def register(**args):
     unsafe_pattern = r'^[^/!#@\$A-Za-z]'
     group_only = args.get('group_only', False)
     disable_errors = args.get('disable_errors', False)
-    permit_sudo = args.get('permit_sudo', False)
-
     if pattern is not None and not pattern.startswith('(?i)'):
         args['pattern'] = '(?i)' + pattern
 
@@ -47,9 +44,6 @@ def register(**args):
     if "disable_errors" in args:
         del args['disable_errors']
 
-    if "permit_sudo" in args:
-        del args['permit_sudo']
-
     if pattern:
         if not ignore_unsafe:
             args['pattern'] = pattern.replace('^.', unsafe_pattern, 1)
@@ -60,20 +54,6 @@ def register(**args):
                 await check.respond("`Are you sure this is a group?`")
                 return
 
-            # Check if the sudo is an admin already, if yes, we can avoid acting to his command.
-            #If his admin was limited, its his problem.
-
-            if not check.out and check.sender_id in BRAIN_CHECKER and permit_sudo:
-                async for user in check.client.iter_participants(
-                        check.chat_id, filter=ChannelParticipantsAdmins):
-                    if user.id in BRAIN_CHECKER:
-                        return
-            # Avoid non-sudos from triggering the command
-            elif not check.out and check.sender_id not in BRAIN_CHECKER:
-                return
-            # Announce that you are handling the request
-            elif not check.out and check.sender_id in BRAIN_CHECKER and permit_sudo:
-                await check.respond("`Processing Sudo Request!`")
             try:
                 await func(check)
 
