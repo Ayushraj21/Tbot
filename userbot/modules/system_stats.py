@@ -136,7 +136,7 @@ async def amireallyalive(alive):
         db = "Redis Cache seems to be failing!"
     else:
         db = "Mongo and Redis Databases functioning normally!"
-    await e.edit("`"
+    await alive.edit("`"
                  "Running.... \n\n"
                  f"Telethon version :{version.__version__} \n"
                  f"Python           :{python_version()} \n"
