@@ -32,6 +32,16 @@ If you find any bugs or have any suggestions then don't hesitate to contact me i
 
 Please head to the wiki on instructions to setting it up!
 
+
+### Contributing to the source:
+
+We love to see you contributing and helping us improve on our way to a perfect userbot.
+
+If you need help writing a new module, you can checkout the [Wiki](https://wiki.raphielgang.org).
+
+Please target your PRs to the staging branch and not master. Commits on `master` wont be done by a user.
+
+
 ### Credits:
 
 I would like to thank people who assisted me throughout this project:
@@ -47,6 +57,7 @@ I would like to thank people who assisted me throughout this project:
 * [@zakaryan2004](https://github.com/zakaryan2004)
 * [@kandnub](https://github.com/kandnub)
 * [@pqhaz](https://github.com/pqhaz)
+* [@yshalsager](https://github.com/yshalsager)
 
 and many more people who aren't mentioned here.
 

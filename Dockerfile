@@ -1,44 +1,7 @@
-# We're using Alpine stable
-FROM alpine:edge
+FROM baalajimaestro/userbot_python:latest
 
-#
-# We have to uncomment Community repo for some packages
-#
-RUN sed -e 's;^#http\(.*\)/v3.9/community;http\1/v3.9/community;g' -i /etc/apk/repositories
-
-# Installing Python 
-RUN apk add --no-cache --update \
-    git \
-    dash \
-    libffi-dev \
-    openssl-dev \
-    bzip2-dev \
-    zlib-dev \
-    readline-dev \
-    sqlite-dev \
-    build-base \
-    python3 \
-    redis \
-    libxslt-dev \
-    libxml2 \
-    libxml2-dev \
-    py-pip \
-    libpq \
-    build-base \
-    linux-headers \
-    jpeg-dev \
-    curl \
-    neofetch \
-    sudo \
-    gcc \
-    python-dev \
-    python3-dev \
-    musl \
-    sqlite \
-    figlet \
-    libwebp-dev
-
-RUN pip3 install --upgrade pip setuptools
+ENV PATH="/app/bin:$PATH"
+WORKDIR /app
 
 # Copy Python Requirements to /app
 
@@ -51,13 +14,12 @@ RUN git clone -b staging https://github.com/Ayushraj21/Tbot /home/userbot/userbo
 WORKDIR /home/userbot/userbot
 
 #
-#Copies session and config(if it exists)
+# Copies session and config(if it exists)
 #
+#COPY ./client_secrets.json* ./secret.json* /app/
 
 #
-# Install requirements
+# Finalization
 #
+CMD ["bash","init/start.sh"]
 
-RUN sudo pip3 install -r requirements.txt
-RUN sudo chmod -R 777 /home/userbot/userbot
-CMD ["dash","init/start.sh"]
