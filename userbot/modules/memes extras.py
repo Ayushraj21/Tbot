@@ -207,8 +207,7 @@ async def leave(e):
             await bot(LeaveChannelRequest(e.chat_id))
         else:
             await e.edit('`Sar This is Not A Chat`')
-            
-@register(outgoing=True, pattern=r"^.val(?: |$)(.*)")
+@register(outgoing=True, pattern=r"^.jeepeval(?: |$)(.*)")
 async def eval(e):
             RUNNING = "**Eval Expression:**\n```{}```\n**Running...**"
             ERROR = "**Eval Expression:**\n```{}```\n**Error:**\n```{}```"

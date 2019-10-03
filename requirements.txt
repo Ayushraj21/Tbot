@@ -9,7 +9,6 @@ google-api-python-client
 oauth2client
 google_images_download>=2.7.1
 googletrans>=2.4.0
-gsearch>=1.6.0
 gtts>=2.0.1
 hachoir
 pybase64>=0.4.0
@@ -20,10 +19,11 @@ requests>=2.18.4
 speedtest-cli>=2.0.2
 spongemock
 telegraph
-telethon>=1.9
+telethon>=1.10.1
 urbandict>=0.5
 wikipedia>=1.4.0
 zalgo_text>=0.6
+search-engine-parser
 spotify_token
 pymongo[srv]
 redis
@@ -33,3 +33,7 @@ humanize
 PyDrive
 lxml
 psutil
+psutil
+pylast
+google
+>>>>>>> 576f5771b11cb13be7095f8a39021c4ff21a86cc
