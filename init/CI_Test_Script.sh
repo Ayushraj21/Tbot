@@ -17,6 +17,7 @@ COMMIT_POINT="$(git log --pretty=format:'%h : %s' -1)"
 COMMIT_HASH="$(git rev-parse --verify HEAD)"
 COMMIT_AUTHOR="$(git log -1 --format='%an <%ae>')"
 REVIEWERS="@baalajimaestro @raphielscape @MrYacha @RealAkito"
+LINT_ALLOWED_BRANCHES="staging dev/haruka"
 TELEGRAM_TOKEN=${BOT_API_KEY}
 export BOT_API_KEY PARSE_BRANCH PARSE_ORIGIN COMMIT_POINT TELEGRAM_TOKEN
 kickstart_pub
@@ -32,12 +33,10 @@ get_session() {
 }
 
 test_run() {
-    python3 -m userbot test
+    python3 -m userbot
     STATUS=${?}
     export STATUS
 }
-
-# Nuke Trap, coz it not working
 
 tg_senderror() {
     if [ ! -z "$PULL_REQUEST_NUMBER" ]; then
@@ -60,7 +59,12 @@ lint() {
   git config --global user.email "baalajimaestro@raphielgang.org"
   git config --global user.name "baalajimaestro"
 
-  if ! yapf -d -r -p userbot; then
+RESULT=`yapf -d -r -p userbot`
+
+  if [ ! -z "$RESULT" ]; then
+      echo $LINT_ALLOWED_BRANCHES | grep $PARSE_BRANCH
+      PERMIT_LINT=`echo $?`
+      if [ "$PERMIT_LINT" == "0" ]; then
             yapf -i -r -p userbot
             message=$(git log -1 --pretty=%B)
             git reset HEAD~1
@@ -70,10 +74,14 @@ lint() {
             git remote add origin https://baalajimaestro:${GH_PERSONAL_TOKEN}@github.com/raphielgang/telegram-userbot.git
             git push -f origin $PARSE_BRANCH
             tg_sendinfo "<code>Code has been Linted and Force Pushed!</code>"
+      else
+        tg_sendinfo "<code>Code has lint issues, but hasn't been linted as per maintainer's request</code>"
+      fi
   else
     tg_sendinfo "<code>Auto-Linter didn't lint anything</code>"
   fi
 }
+
 tg_yay() {
   if [ ! -z "$PULL_REQUEST_NUMBER" ]; then
 

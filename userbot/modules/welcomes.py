@@ -17,18 +17,8 @@ from userbot.modules.admin import BANNED_RIGHTS, UNBAN_RIGHTS
 
 @bot.on(events.ChatAction)
 async def welcome_mute(welcm):
-    ''' Ban a recently joined user if it matches the spammer checking algorithm. '''
-    if welcm.user_joined or welcm.user_added:
-        users = []
-
-        if welcm.user_added:
-            for i in welcm.action_message.action.users:
-                users.append(i)
-
-        spambot = False
-
-        await sleep(5)
-
+    ''' Ban a recently joined user if it matches the spammer checking algorithm.'''
+    try:
         if not WELCOME_MUTE:
             return
 

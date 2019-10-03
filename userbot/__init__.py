@@ -10,13 +10,12 @@ from distutils.util import strtobool as sb
 from logging import DEBUG, INFO, basicConfig, getLogger
 from sys import version_info
 
-from pyDownload import Downloader
-import pylast
-import redis
 from dotenv import load_dotenv
 from pyDownload import Downloader
+from pylast import LastFMNetwork, md5
 from pymongo import MongoClient
 from telethon.sessions import StringSession
+from redis import StrictRedis
 from requests import get
 from telethon import TelegramClient
 
@@ -81,12 +80,12 @@ LASTFM_API = os.environ.get("LASTFM_API", None)
 LASTFM_SECRET = os.environ.get("LASTFM_SECRET", None)
 LASTFM_USERNAME = os.environ.get("LASTFM_USERNAME", None)
 LASTFM_PASSWORD_PLAIN = os.environ.get("LASTFM_PASSWORD", None)
-LASTFM_PASS = pylast.md5(LASTFM_PASSWORD_PLAIN)
+LASTFM_PASS = md5(LASTFM_PASSWORD_PLAIN)
 if not LASTFM_USERNAME == "None":
-    lastfm = pylast.LastFMNetwork(api_key=LASTFM_API,
-                                  api_secret=LASTFM_SECRET,
-                                  username=LASTFM_USERNAME,
-                                  password_hash=LASTFM_PASS)
+    lastfm = LastFMNetwork(api_key=LASTFM_API,
+                           api_secret=LASTFM_SECRET,
+                           username=LASTFM_USERNAME,
+                           password_hash=LASTFM_PASS)
 else:
     lastfm = None
 
@@ -136,7 +135,7 @@ def is_mongo_alive():
 # Init Redis
 # Redis will be hosted inside the docker container that hosts the bot
 # We need redis for just caching, so we just leave it to non-persistent
-REDIS = redis.StrictRedis(host='localhost', port=6379, db=0)
+REDIS = StrictRedis(host='localhost', port=6379, db=0)
 
 
 def is_redis_alive():

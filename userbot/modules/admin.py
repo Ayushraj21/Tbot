@@ -433,10 +433,6 @@ async def muter(moot):
 @register(outgoing=True, group_only=True, pattern="^.ungmute(?: |$)(.*)")
 async def ungmoot(un_gmute):
     """ For .ungmute command, ungmutes the target in the userbot """
-    # Admin or creator check
-    chat = await un_gmute.get_chat()
-    admin = chat.admin_rights
-    creator = chat.creator
 
     # Check if the function running under SQL mode
     if not is_mongo_alive() or not is_redis_alive():
@@ -468,10 +464,6 @@ async def ungmoot(un_gmute):
 @register(outgoing=True, group_only=True, pattern="^.gmute(?: |$)(.*)")
 async def gspider(gspdr):
     """ For .gmute command, gmutes the target in the userbot """
-    # Admin or creator check
-    chat = await gspdr.get_chat()
-    admin = chat.admin_rights
-    creator = chat.creator
 
     # Check if the function running under SQL mode
     if not is_mongo_alive() or not is_redis_alive():
@@ -708,6 +700,7 @@ async def get_user_from_id(user, event):
     return user_obj
 
 
+# TODO : Clean this
 CMD_HELP.update(
     {"promote": "Usage: Reply to message with .promote to promote them."})
 CMD_HELP.update({"ban": "Usage: Reply to message with .ban to ban them."})

@@ -125,7 +125,7 @@ async def pipcheck(pip):
 
 
 @register(outgoing=True, pattern="^.alive$")
-async def amireallyalive(e):
+async def amireallyalive(alive):
     if not is_mongo_alive() and not is_redis_alive():
         db = "Both Mongo and Redis Database seems to be failing!"
     elif not is_mongo_alive():
@@ -133,7 +133,7 @@ async def amireallyalive(e):
     elif not is_redis_alive():
         db = "Redis Cache seems to be failing!"
     else:
-        db = "Databases functioning normally!"
+        db = "Mongo and Redis Databases functioning normally!"
     await e.edit("`"
                  "Running.... \n\n"
                  f"Telethon version :{version.__version__} \n"
@@ -169,16 +169,16 @@ async def amireallyalivereset(ureset):
 
 
 CMD_HELP.update(
-    {"sysd": ".sysd"
-     "\nUsage: Show system information using neofetch."})
-CMD_HELP.update({"botver": ".botver" "\nUsage: Show the userbot version."})
+    {"sysd": ".sysd\n"
+     "Usage: Show system information using neofetch."})
+CMD_HELP.update({"botver": ".botver\n" "Usage: Show the userbot version."})
 CMD_HELP.update(
-    {"pip": ".pip <module(s)>"
-     "\nUsage: Search module(s) in PyPi."})
+    {"pip": ".pip <module(s)>\n"
+     "Usage: Search module(s) in PyPi."})
 CMD_HELP.update({
     "alive":
-    ".alive"
-    "\nUsage: Check if your bot is working or not. "
+    ".alive\n"
+    "Usage: Check if your bot is working or not. "
     "Use .aliveu <new_user> to change user name, or .resetalive "
     "to reset it to default."
 })

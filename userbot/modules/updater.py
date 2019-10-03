@@ -109,10 +109,14 @@ async def upstream(ups):
 
 CMD_HELP.update({
     'update':
-    '.update'
-    '\nUsage: Check if the main userbot repository has any'
+    '.update\n'
+    'Usage: Check if the main userbot repository has any'
     'updates and show changelog if so.'
-    '\n\n.update now'
-    '\nUsage: Update your userbot, if there are any'
+})
+
+CMD_HELP.update({
+    'update':
+    '.update now\n'
+    'Usage: Update your userbot, if there are any'
     'updates in the main userbot repository.'
 })

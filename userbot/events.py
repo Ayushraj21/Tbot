@@ -6,17 +6,15 @@
 """ Userbot module for managing events.
  One of the main components of the userbot. """
 
-import asyncio
-import datetime
-import math
-import subprocess
 import sys
-import traceback
+from asyncio import create_subprocess_shell as asyncsubshell
+from asyncio import subprocess as asyncsub
 from os import remove
 from time import gmtime, strftime
 from traceback import format_exc
 
 from telethon import events
+from telethon.tl.types import ChannelParticipantsAdmins
 
 from userbot import bot
 
@@ -56,21 +54,26 @@ def register(**args):
 
             try:
                 await func(check)
-
+            #
+            # HACK HACK HACK
+            # Raise StopPropagation to Raise StopPropagation
+            # This needed for AFK to working properly
+            # TODO
+            # Rewrite events to not passing all exceptions
+            #
+            except events.StopPropagation:
+                raise events.StopPropagation
             # This is a gay exception and must be passed out. So that it doesnt spam chats
-
             except KeyboardInterrupt:
                 pass
             except BaseException:
 
-                # Check if we have to disable it. If not silence the log spam on the console, with a dumb except.
+                # Check if we have to disable it.
+                # If not silence the log spam on the console,
+                # with a dumb except.
 
                 if not disable_errors:
                     date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-                    new = {
-                        'error': str(sys.exc_info()[1]),
-                        'date': datetime.datetime.now()
-                    }
 
                     text = "**Sorry, I encountered a error!**\n"
                     link = "[https://t.me/userbot_support](Userbot Support Chat)"
@@ -90,7 +93,7 @@ def register(**args):
                     ftext += "\n\nEvent Trigger:\n"
                     ftext += str(check.text)
                     ftext += "\n\nTraceback info:\n"
-                    ftext += str(traceback.format_exc())
+                    ftext += str(format_exc())
                     ftext += "\n\nError text:\n"
                     ftext += str(sys.exc_info()[1])
                     ftext += "\n\n--------END USERBOT TRACEBACK LOG--------"
@@ -99,10 +102,9 @@ def register(**args):
 
                     ftext += "\n\n\nLast 5 commits:\n"
 
-                    process = await asyncio.create_subprocess_shell(
-                        command,
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE)
+                    process = await asyncsubshell(command,
+                                                  stdout=asyncsub.PIPE,
+                                                  stderr=asyncsub.PIPE)
                     stdout, stderr = await process.communicate()
                     result = str(stdout.decode().strip()) \
                         + str(stderr.decode().strip())
